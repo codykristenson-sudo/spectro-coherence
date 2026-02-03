@@ -1,0 +1,65 @@
+name: Publish to Zenodo
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  zenodo-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Create Zenodo metadata
+        run: |
+          cat > .zenodo.json << EOF
+          {
+            "title": "spectro-coherence: Coherence Analysis for Astronomical Spectroscopy",
+            "description": "Python package implementing the C-Index (Coherence Index) framework for quality assessment of spectroscopic data.",
+            "creators": [
+              {
+                "name": "Kristenson, Cody A.",
+                "affiliation": "Independent Researcher"
+              }
+            ],
+            "access_right": "open",
+            "license": "MIT",
+            "upload_type": "software",
+            "keywords": [
+              "astronomy",
+              "spectroscopy",
+              "coherence analysis",
+              "quality control",
+              "data analysis"
+            ],
+            "related_identifiers": [
+              {
+                "identifier": "https://zenodo.org/communities/eos-framework",
+                "relation": "isPartOf",
+                "scheme": "url"
+              }
+            ],
+            "communities": [
+              {
+                "identifier": "eos-framework"
+              }
+            ]
+          }
+          EOF
+      
+      - name: Archive release
+        uses: actions/upload-artifact@v3
+        with:
+          name: spectro-coherence-${{ github.event.release.tag_name }}
+          path: |
+            spectro_coherence/
+            examples/
+            tests/
+            requirements.txt
+            setup.py
+            README.md
+            LICENSE
+            .zenodo.json
+
+# Note: Actual Zenodo upload requires webhook configuration
+# See: https://docs.github.com/en/repositories/archiving-a-github-repository/referencing-and-citing-content
